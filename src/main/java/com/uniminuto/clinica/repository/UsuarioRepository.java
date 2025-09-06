@@ -17,4 +17,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByUsername(String nombreUsuario);
         
     List<Usuario> findByActivo(boolean estado);
+    
+    /**
+     * Busca un usuario por número de documento
+     * @param numeroDocumento Número de documento a buscar
+     * @return Usuario encontrado o vacío
+     */
+    Optional<Usuario> findByNumeroDocumento(String numeroDocumento);
 }

@@ -46,5 +46,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         boolean activo = estado == 1? true : false;
         return this.usuarioRepository.findByActivo(activo);
     }
+
+    @Override
+    public Optional<Usuario> buscarPorNumeroDocumento(String numeroDocumento) {
+        return this.usuarioRepository.findByNumeroDocumento(numeroDocumento);
+    }
     
 }

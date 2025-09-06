@@ -2,15 +2,15 @@ package com.uniminuto.clinica.apicontroller;
 
 import com.uniminuto.clinica.api.UsuarioApi;
 import com.uniminuto.clinica.entity.Usuario;
+import com.uniminuto.clinica.model.RespuestaRs;
 import com.uniminuto.clinica.service.UsuarioService;
-import java.util.List;
-import org.apache.coyote.BadRequestException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- *
+ * Controlador API para la entidad Usuario
  * @author lmora
  */
 @RestController
@@ -20,26 +20,27 @@ public class UsuarioApiController implements UsuarioApi {
     private UsuarioService usuarioService;
 
     @Override
-    public ResponseEntity<List<Usuario>> listarUsuarios() {
-        return ResponseEntity.ok(this.usuarioService.listarTodosLosUsuarios());
+    public ResponseEntity<RespuestaRs> buscarUsuarioPorDocumento(String numeroDocumento) {
+        RespuestaRs respuesta = new RespuestaRs();
+        
+        try {
+            Optional<Usuario> usuario = usuarioService.buscarPorNumeroDocumento(numeroDocumento);
+            
+            if (usuario.isPresent()) {
+                Usuario user = usuario.get();
+                respuesta.setStatus(200);
+                respuesta.setMensaje("Usuario encontrado: " + user.getUsername() + 
+                                  " - Rol: " + user.getRol() + 
+                                  " - Activo: " + (user.isActivo() ? "Sí" : "No"));
+            } else {
+                respuesta.setStatus(404);
+                respuesta.setMensaje("No se encontró ningún usuario con el documento: " + numeroDocumento);
+            }
+        } catch (Exception e) {
+            respuesta.setStatus(500);
+            respuesta.setMensaje("Error al buscar usuario: " + e.getMessage());
+        }
+        
+        return ResponseEntity.ok(respuesta);
     }
-
-    @Override
-    public ResponseEntity<List<Usuario>> listarUsuariosPorRol(String rol) {
-        return ResponseEntity.ok(this.usuarioService.encontrarPorRol(rol));
-    }
-
-    @Override
-    public ResponseEntity<Usuario> buscarUsuarioPorNombre(String nombre) 
-            throws BadRequestException{
-        return ResponseEntity.ok(this.usuarioService.encontrarPorNombre(nombre));
-    }
-
-    @Override
-    public ResponseEntity<List<Usuario>> buscarUsuariosPorEstado(Integer activo) 
-            throws BadRequestException {
-        return ResponseEntity.ok(this
-                .usuarioService.buscarPorEstado(activo));
-    }
-
 }
